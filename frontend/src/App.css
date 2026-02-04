@@ -1,0 +1,149 @@
+body {
+  background: #0f172a;
+}
+
+.App {
+  color: white;
+  min-height: 100vh;
+}
+
+.App-header {
+  padding: 30px;
+  text-align: center;
+}
+
+.main-section {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  width: 90vw;
+  margin: auto;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.row input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.login-signup-toggle{
+  display: flex;
+  justify-content: end;
+  margin-top: 4px;
+  span{
+    padding: 0 10px;
+    color: blueviolet;
+    cursor: pointer;
+  }
+}
+
+.notes-input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 94%;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #38bdf8;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #0ea5e9;
+}
+
+.result,
+.status {
+  margin-top: 15px;
+  font-size: 16px;
+}
+
+.notes-container {
+  width: 35vw;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-row {
+  display: grid;
+  grid-template-columns: 20% 1fr 80px;
+  align-items: center;
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+
+.note-title {
+  color: black;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #444;
+}
+
+.note-delete {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  text-align: right;
+}

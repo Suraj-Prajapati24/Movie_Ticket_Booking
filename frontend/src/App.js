@@ -1,30 +1,54 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import MoviesPage from "./pages/MoviesPage";
+import ShowsPage from "./pages/ShowsPage";
+import SeatsPage from "./pages/SeatsPage";
+import AuthPage from "./pages/AuthPage";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 import "./App.css";
-import Login from "./components/Login";
-import SignUp from "./components/SignUp";
-import UserInfo from "./components/UserInfo";
 
 function App() {
-  const [user, setUser] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedShow, setSelectedShow] = useState(null);
+  const role = localStorage.getItem("role");
+  if (!isLoggedIn) {
+    return <AuthPage onLogin={() => setIsLoggedIn(true)} />;
+  }
+
+  if (role === "manager") {
+    return <AdminDashboard />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>React API Demo</h1>
-      </header>
+    <div className="container">
+      <div style={{ padding: "20px" }}>
+        <h1>MovieJunction</h1>
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            setIsLoggedIn(false);
+          }}
+        >
+          Logout
+        </button>
+        {!selectedMovie && <MoviesPage onSelectMovie={setSelectedMovie} />}
 
-      <main className="main-section">
-        {user ? (
-          <UserInfo user={user} setUser={setUser}/>
-        ) : signUpPage ? (
-          <SignUp setSignUpPage={setSignUpPage} user={user} setUser={setUser} />
-        ) : (
-          <Login setSignUpPage={setSignUpPage} user={user} setUser={setUser} />
+        {selectedMovie && !selectedShow && (
+          <div>
+            <button onClick={() => setSelectedMovie(null)}>⬅ Back</button>
+
+            <ShowsPage movieId={selectedMovie} onSelectShow={setSelectedShow} />
+          </div>
         )}
-        {user && (<Page/>)}
-        {user && (<NotesDisplay notes={notes} setNotes={setNotes}/>)}
 
-        
-      </main>
+        {selectedShow && (
+          <div>
+            <button onClick={() => setSelectedShow(null)}>⬅ Back</button>
+
+            <SeatsPage showId={selectedShow} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

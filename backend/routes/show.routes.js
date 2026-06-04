@@ -1,8 +1,12 @@
 import express from "express";
-import { getShowSeats } from "../controllers/show.controller.js";
+import {
+  getShowSeats,
+  getShowsByMovie,
+} from "../controllers/show.controller.js";
 
-const showRouter = express.Router();
+const router = express.Router();
 
-showRouter.get("/:show_id/seats", getShowSeats);
+router.get("/:show_id/seats", getShowSeats);
+router.get("/movie/:movie_id", getShowsByMovie);
 
-export default showRouter;
+export default router;

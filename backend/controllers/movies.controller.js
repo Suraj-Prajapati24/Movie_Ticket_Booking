@@ -14,3 +14,32 @@ export const getAllMovies = async (req, res) => {
         });
     }
 };
+
+export const createMovie = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      duration_minutes,
+      language,
+    } = req.body;
+
+    const result = await client.query(
+      `
+      INSERT INTO movies
+      (title, description, duration_minutes, language)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
+      `,
+      [title, description, duration_minutes, language]
+    );
+
+    return res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Failed to create movie",
+    });
+  }
+};

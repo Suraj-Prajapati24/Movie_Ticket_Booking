@@ -11,6 +11,7 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedShow, setSelectedShow] = useState(null);
   const role = localStorage.getItem("role");
+
   if (!isLoggedIn) {
     return <AuthPage onLogin={() => setIsLoggedIn(true)} />;
   }
@@ -19,37 +20,88 @@ function App() {
     return <AdminDashboard />;
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    setIsLoggedIn(false);
+  };
+
+  const handleSelectMovie = (movieId, movieTitle) => {
+    setSelectedMovie({ id: movieId, title: movieTitle });
+    setSelectedShow(null);
+  };
+
+  const handleSelectShow = (showId) => {
+    setSelectedShow(showId);
+  };
+
+  const handleBackToMovies = () => {
+    setSelectedMovie(null);
+    setSelectedShow(null);
+  };
+
+  const handleBackToShows = () => {
+    setSelectedShow(null);
+  };
+
   return (
-    <div className="container">
-      <div style={{ padding: "20px" }}>
-        <h1>MovieJunction</h1>
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            setIsLoggedIn(false);
-          }}
-        >
+    <>
+      <header className="app-header">
+        <div className="logo">🎬 <span>Movie</span>Junction</div>
+
+        <nav className="breadcrumb">
+          <span
+            style={{ cursor: selectedMovie ? "pointer" : "default", color: selectedMovie ? "var(--text-muted)" : "var(--gold)" }}
+            onClick={selectedMovie ? handleBackToMovies : undefined}
+          >
+            Movies
+          </span>
+          {selectedMovie && (
+            <>
+              <span className="sep">›</span>
+              <span
+                style={{ cursor: selectedShow ? "pointer" : "default", color: selectedShow ? "var(--text-muted)" : "var(--gold)" }}
+                onClick={selectedShow ? handleBackToShows : undefined}
+              >
+                {selectedMovie.title}
+              </span>
+            </>
+          )}
+          {selectedShow && (
+            <>
+              <span className="sep">›</span>
+              <span className="current">Select Seats</span>
+            </>
+          )}
+        </nav>
+
+        <button className="btn btn-ghost btn-sm" onClick={handleLogout}>
           Logout
         </button>
-        {!selectedMovie && <MoviesPage onSelectMovie={setSelectedMovie} />}
+      </header>
+
+      <div className="page">
+        {!selectedMovie && (
+          <MoviesPage onSelectMovie={handleSelectMovie} />
+        )}
 
         {selectedMovie && !selectedShow && (
-          <div>
-            <button onClick={() => setSelectedMovie(null)}>⬅ Back</button>
-
-            <ShowsPage movieId={selectedMovie} onSelectShow={setSelectedShow} />
-          </div>
+          <ShowsPage
+            movieId={selectedMovie.id}
+            movieTitle={selectedMovie.title}
+            onSelectShow={handleSelectShow}
+            onBack={handleBackToMovies}
+          />
         )}
 
         {selectedShow && (
-          <div>
-            <button onClick={() => setSelectedShow(null)}>⬅ Back</button>
-
-            <SeatsPage showId={selectedShow} />
-          </div>
+          <SeatsPage
+            showId={selectedShow}
+            onBack={handleBackToShows}
+          />
         )}
       </div>
-    </div>
+    </>
   );
 }
 

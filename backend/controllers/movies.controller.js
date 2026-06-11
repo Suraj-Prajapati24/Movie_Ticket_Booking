@@ -43,3 +43,35 @@ export const createMovie = async (req, res) => {
     });
   }
 };
+
+export const deleteMovie = async (req, res) => {
+  const { movie_id } = req.params;
+
+  try {
+    const result = await client.query(
+      `
+      DELETE FROM movies
+      WHERE movie_id = $1
+      RETURNING *
+      `,
+      [movie_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        message: "Movie not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Movie deleted successfully",
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Failed to delete movie",
+    });
+  }
+};

@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import bookingRouter from "./routes/bookings.routes.js";
 import showRouter from "./routes/show.routes.js";
 import moviesRouter from "./routes/movies.routes.js";
+import screensRouter from "./routes/screens.routes.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use("/auth", router);
 app.use("/bookings", bookingRouter);
 app.use("/shows", showRouter);
 app.use("/movies", moviesRouter);
+app.use("/screens", screensRouter);
 
 app.listen(5000, () => {
     console.log("app is listenging");

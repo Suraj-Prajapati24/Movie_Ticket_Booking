@@ -4,7 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "db:schema": "node db/run-sql.js db/schema.sql",
+    "db:seed": "node db/run-sql.js db/seed.sql",
+    "db:reset": "node db/run-sql.js db/schema.sql db/seed.sql"
   },
   "author": "Suraj Prajapati",
   "license": "ISC",

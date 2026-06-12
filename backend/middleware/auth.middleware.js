@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev_secret_change_me";
+
 export const authenticateToken = (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
@@ -14,8 +16,7 @@ export const authenticateToken = (req, res, next) => {
         message: "Invalid token format",
       });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userDetails = decoded;
     next();
   } catch (error) {

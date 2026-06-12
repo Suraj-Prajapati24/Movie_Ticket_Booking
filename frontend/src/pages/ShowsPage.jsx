@@ -63,21 +63,34 @@ export default function ShowsPage({ movieId, movieTitle, onSelectShow, onBack })
 
       {!loading && !error && (
         <div className="shows-list">
-          {shows.map((show) => (
-            <div
-              key={show.show_id}
-              className="card clickable show-card"
-              onClick={() => onSelectShow(show.show_id)}
-            >
-              <div>
-                <div className="show-time">
-                  {formatTime(show.start_time)} – {formatTime(show.end_time)}
+          {shows.map((show) => {
+            const total = Number(show.total_seats) || 0;
+            const booked = Number(show.booked_seats) || 0;
+            const left = Math.max(total - booked, 0);
+            const soldOut = total > 0 && left === 0;
+            return (
+              <div
+                key={show.show_id}
+                className={`card show-card ${soldOut ? "" : "clickable"}`}
+                onClick={() => !soldOut && onSelectShow(show.show_id)}
+                style={soldOut ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+              >
+                <div>
+                  <div className="show-time">
+                    {formatTime(show.start_time)} – {formatTime(show.end_time)}
+                  </div>
+                  <div className="show-date">
+                    {formatDate(show.start_time)}
+                    {show.price != null && <> · ₹{Number(show.price)}/seat</>}
+                  </div>
+                  <div className="show-seats-left">
+                    {soldOut ? "Sold out" : `${left} seat${left === 1 ? "" : "s"} left`}
+                  </div>
                 </div>
-                <div className="show-date">{formatDate(show.start_time)}</div>
+                <span className="screen-badge">Screen {show.screen_number}</span>
               </div>
-              <span className="screen-badge">Screen {show.screen_number}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

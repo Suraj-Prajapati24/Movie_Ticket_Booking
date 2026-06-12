@@ -218,6 +218,12 @@ body {
   margin-top: 2px;
 }
 
+.show-card .show-seats-left {
+  font-size: 0.75rem;
+  color: var(--green);
+  margin-top: 4px;
+}
+
 .show-card .screen-badge {
   background: var(--surface-3);
   border: 1px solid var(--border);
@@ -701,6 +707,129 @@ select.form-input { appearance: none; cursor: pointer; }
 .success-check { background: rgba(16,185,129,.15); color: var(--green); border: 2px solid var(--green); }
 .error-cross   { background: rgba(239,68,68,.15);  color: var(--red);   border: 2px solid var(--red); }
 .modal-center .modal-actions { margin-top: 18px; }
+
+/* ─── Screen-wise show groups (admin) ───────────────────────── */
+.screen-groups { display: flex; flex-direction: column; gap: 22px; }
+
+.screen-group {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.screen-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.screen-group-title { display: flex; align-items: center; gap: 10px; margin: 0; }
+
+.screen-chip {
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.screen-group-count { font-size: 0.75rem; color: var(--text-muted); }
+
+.show-row.clickable { cursor: pointer; transition: background var(--transition); }
+.show-row.clickable:hover { background: var(--surface-3); }
+.show-row-cta { color: var(--gold); font-size: 0.78rem; white-space: nowrap; text-align: right; }
+
+/* ─── Seat-map modal (admin, read-only) ─────────────────────── */
+.seat-map-modal { max-width: 420px; position: relative; }
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.modal-close:hover { color: var(--text); }
+
+.seat-map-sub { font-size: 0.8rem; color: var(--text-muted); margin: -10px 0 16px; }
+
+.seat-grid-readonly { padding: 16px; }
+
+.seat-chip {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 2px solid transparent;
+}
+.seat-chip-free   { background: #10b981; color: #fff; }
+.seat-chip-booked { background: #1f2937; border-color: #374151; color: #6b7280; }
+
+.seat-map-occupancy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ─── Header actions / client nav ───────────────────────────── */
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* ─── My Bookings ───────────────────────────────────────────── */
+.bookings-list { display: flex; flex-direction: column; gap: 12px; }
+
+.booking-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  padding: 16px 18px;
+}
+
+.booking-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+.booking-card-meta { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; }
+.booking-card-seats { font-size: 0.85rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.booking-seat-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+}
+
+.booking-card-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  text-align: right;
+}
+.booking-amount { font-size: 1.1rem; font-weight: 800; color: var(--gold); }
+.booking-id { font-size: 0.72rem; color: var(--text-muted); }
+
+.booking-status {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+}
+.booking-status-confirmed { background: rgba(16,185,129,.14); color: #34d399; }
+.booking-status-cancelled { background: rgba(239,68,68,.14); color: #f87171; }
 
 /* ─── Responsive table → stacked cards ──────────────────────── */
 @media (max-width: 560px) {

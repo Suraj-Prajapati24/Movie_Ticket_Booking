@@ -1,25 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Seat from "../components/Seat";
 import PaymentModal from "../components/PaymentModal";
 import { API_BASE } from "../config";
 
-const PRICE_PER_SEAT = 200; // ₹ — dummy pricing until the backend stores it
+function parseShowDate(str) {
+  if (!str) return new Date(NaN);
+  return new Date(str.includes("T") ? str : str.replace(" ", "T"));
+}
+
+function formatDateTime(str) {
+  const d = parseShowDate(str);
+  if (isNaN(d)) return str || "";
+  return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
 
 export default function SeatsPage({ showId, onBack }) {
+  const [show, setShow] = useState(null);
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [message, setMessage] = useState(null); // { type: "success"|"error", text }
   const [loading, setLoading] = useState(true);
   const [showPayment, setShowPayment] = useState(false);
 
+  // Price comes from the show now (admin sets it per show), not a hardcoded const.
+  const pricePerSeat = Number(show?.price) || 0;
+
   const loadSeats = () => {
     setLoading(true);
-    fetch(`${API_BASE}/shows/${showId}/seats`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        return res.json();
+    Promise.all([
+      fetch(`${API_BASE}/shows/${showId}`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/shows/${showId}/seats`).then((r) => {
+        if (!r.ok) throw new Error(`Server error ${r.status}`);
+        return r.json();
+      }),
+    ])
+      .then(([showData, seatData]) => {
+        if (showData) setShow(showData);
+        setSeats(Array.isArray(seatData) ? seatData : []);
       })
-      .then((data) => setSeats(Array.isArray(data) ? data : []))
       .catch((err) => setMessage({ type: "error", text: err.message }))
       .finally(() => setLoading(false));
   };
@@ -27,6 +45,12 @@ export default function SeatsPage({ showId, onBack }) {
   useEffect(() => {
     loadSeats();
   }, [showId]);
+
+  // Lay the grid out to match the screen's real row width (e.g. 6 or 8 wide).
+  const columns = useMemo(() => {
+    const max = seats.reduce((m, s) => Math.max(m, Number(s.seat_col) || 0), 0);
+    return max || 6;
+  }, [seats]);
 
   const toggleSeat = (seatId) => {
     setMessage(null);
@@ -81,6 +105,12 @@ export default function SeatsPage({ showId, onBack }) {
         <h2>Select Seats</h2>
       </div>
 
+      {show && (
+        <p className="seat-map-sub" style={{ marginTop: -8 }}>
+          {show.movie_title} · Screen {show.screen_number} · {formatDateTime(show.start_time)} · ₹{pricePerSeat}/seat
+        </p>
+      )}
+
       {message && (
         <div className={`msg ${message.type === "success" ? "msg-success" : "msg-error"}`} style={{ marginBottom: 16 }}>
           {message.text}
@@ -93,7 +123,10 @@ export default function SeatsPage({ showId, onBack }) {
         <div className="seat-section">
           <div>
             <div className="screen-bar">◀ SCREEN ▶</div>
-            <div className="seat-grid">
+            <div
+              className="seat-grid"
+              style={{ gridTemplateColumns: `repeat(${columns}, 44px)` }}
+            >
               {seats.map((seat) => (
                 <Seat
                   key={seat.seat_id}
@@ -124,14 +157,14 @@ export default function SeatsPage({ showId, onBack }) {
             <div className="booking-summary">
               {selectedSeats.length === 0
                 ? "Click seats above to select them"
-                : <><strong>{selectedSeats.length}</strong> seat{selectedSeats.length > 1 ? "s" : ""} · ₹{selectedSeats.length * PRICE_PER_SEAT}</>}
+                : <><strong>{selectedSeats.length}</strong> seat{selectedSeats.length > 1 ? "s" : ""} · ₹{selectedSeats.length * pricePerSeat}</>}
             </div>
             <button
               className="btn btn-primary"
               onClick={() => { setMessage(null); setShowPayment(true); }}
               disabled={selectedSeats.length === 0}
             >
-              {selectedSeats.length > 0 ? `Pay ₹${selectedSeats.length * PRICE_PER_SEAT}` : "Confirm Booking"}
+              {selectedSeats.length > 0 ? `Pay ₹${selectedSeats.length * pricePerSeat}` : "Confirm Booking"}
             </button>
           </div>
         </div>
@@ -140,7 +173,7 @@ export default function SeatsPage({ showId, onBack }) {
       {showPayment && (
         <PaymentModal
           seatLabels={selectedLabels}
-          pricePerSeat={PRICE_PER_SEAT}
+          pricePerSeat={pricePerSeat}
           onPay={submitBooking}
           onClose={() => setShowPayment(false)}
           onSuccess={handlePaymentSuccess}

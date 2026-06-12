@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { API_BASE } from "../config";
 
-const EMPTY = { movie_id: "", screen_number: "", start_time: "" };
+const EMPTY = { movie_id: "", screen_id: "", start_time: "", price: "" };
 
 // Add `minutes` to a "YYYY-MM-DDTHH:MM" datetime-local string and return the
 // same local format (no timezone shift). Returns "" if input is incomplete.
+// This is for the on-screen preview only — the backend computes the real end.
 function addMinutesLocal(dtLocal, minutes) {
   if (!dtLocal || !minutes) return "";
   const d = new Date(dtLocal);
@@ -21,28 +22,38 @@ function prettify(dtLocal) {
   return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-export default function AddShow() {
-  const [form, setForm] = useState(EMPTY);
+export default function AddShow({ initialScreen = "" }) {
+  const [form, setForm] = useState({ ...EMPTY, screen_id: initialScreen });
   const [movies, setMovies] = useState([]);
+  const [screens, setScreens] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch(`${API_BASE}/movies`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`${API_BASE}/movies`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.json())
       .then((data) => setMovies(Array.isArray(data) ? data : []))
       .catch(() => {});
+
+    fetch(`${API_BASE}/screens`)
+      .then((res) => res.json())
+      .then((data) => setScreens(Array.isArray(data) ? data : []))
+      .catch(() => {});
   }, []);
 
+  // When the admin clicks "+ Add show" on a specific screen, prefill it here.
+  useEffect(() => {
+    if (initialScreen) setForm((f) => ({ ...f, screen_id: String(initialScreen) }));
+  }, [initialScreen]);
+
+  // Compare as strings — select values are strings, ids from the API are numbers.
   const selectedMovie = useMemo(
-    () => movies.find((m) => m.movie_id === form.movie_id),
+    () => movies.find((m) => String(m.movie_id) === String(form.movie_id)),
     [movies, form.movie_id]
   );
 
-  // End time is derived, never entered by hand.
+  // End time is derived from the movie's runtime — shown read-only as a preview.
   const endTime = useMemo(
     () => addMinutesLocal(form.start_time, selectedMovie?.duration_minutes),
     [form.start_time, selectedMovie]
@@ -59,7 +70,11 @@ export default function AddShow() {
       setMessage({ type: "error", text: "Selected movie has no duration set, so the end time can't be calculated." });
       return;
     }
-    if (!endTime) {
+    if (!form.screen_id) {
+      setMessage({ type: "error", text: "Please pick a screen." });
+      return;
+    }
+    if (!form.start_time) {
       setMessage({ type: "error", text: "Please pick a valid start time." });
       return;
     }
@@ -68,6 +83,8 @@ export default function AddShow() {
 
     const token = localStorage.getItem("token");
     try {
+      // end_time is intentionally NOT sent — the backend derives it from the
+      // movie's runtime so it can't be tampered with.
       const res = await fetch(`${API_BASE}/shows`, {
         method: "POST",
         headers: {
@@ -75,16 +92,20 @@ export default function AddShow() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          movie_id: form.movie_id,
-          screen_number: Number(form.screen_number),
+          movie_id: Number(form.movie_id),
+          screen_id: Number(form.screen_id),
           start_time: form.start_time,
-          end_time: endTime,
+          price: form.price === "" ? undefined : Number(form.price),
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage({ type: "success", text: `Show #${data.show_id} created with 18 seats.` });
-        setForm(EMPTY);
+        const screen = screens.find((s) => String(s.screen_id) === String(form.screen_id));
+        setMessage({
+          type: "success",
+          text: `Show #${data.show_id} created${screen ? ` on ${screen.name}` : ""}.`,
+        });
+        setForm({ ...EMPTY });
       } else {
         setMessage({ type: "error", text: data.message || "Failed to create show" });
       }
@@ -120,15 +141,29 @@ export default function AddShow() {
         </div>
 
         <div className="form-group">
-          <label>Screen Number</label>
-          <input name="screen_number" type="number" min="1" value={form.screen_number}
-            onChange={handleChange} className="form-input" placeholder="e.g. 1" required />
+          <label>Screen</label>
+          <select name="screen_id" value={form.screen_id} onChange={handleChange}
+            className="form-input" required>
+            <option value="">— Select a screen —</option>
+            {screens.map((s) => (
+              <option key={s.screen_id} value={s.screen_id}>
+                {s.name} · {s.capacity} seats
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="form-group">
-          <label>Start Time</label>
-          <input name="start_time" type="datetime-local" value={form.start_time}
-            onChange={handleChange} className="form-input" required />
+        <div className="form-row">
+          <div className="form-group">
+            <label>Start Time</label>
+            <input name="start_time" type="datetime-local" value={form.start_time}
+              onChange={handleChange} className="form-input" required />
+          </div>
+          <div className="form-group">
+            <label>Ticket Price (₹) <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>(optional)</span></label>
+            <input name="price" type="number" min="0" step="1" value={form.price}
+              onChange={handleChange} className="form-input" placeholder="Defaults to ₹200" />
+          </div>
         </div>
 
         {/* End time is computed from the movie's runtime — shown read-only. */}

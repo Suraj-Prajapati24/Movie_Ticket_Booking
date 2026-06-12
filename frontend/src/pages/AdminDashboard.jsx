@@ -5,6 +5,12 @@ import ManageShows from "./ManageShows";
 
 export default function AdminDashboard() {
   const [view, setView] = useState("manage");
+  const [prefillScreen, setPrefillScreen] = useState("");
+
+  const handleAddShowForScreen = (screen) => {
+    setPrefillScreen(screen != null ? String(screen) : "");
+    setView("shows");
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -44,9 +50,9 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {view === "manage" && <ManageShows />}
+        {view === "manage" && <ManageShows onAddShow={handleAddShowForScreen} />}
         {view === "movies" && <AddMovie />}
-        {view === "shows" && <AddShow />}
+        {view === "shows" && <AddShow initialScreen={prefillScreen} />}
       </div>
     </>
   );

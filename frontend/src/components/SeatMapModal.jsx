@@ -9,7 +9,13 @@ function parseShowDate(str) {
 function formatDateTime(str) {
   const d = parseShowDate(str);
   if (isNaN(d)) return str || "—";
-  return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function dummySeats() {
@@ -94,7 +100,9 @@ export default function SeatMapModal({ show, onClose }) {
         role="dialog"
         aria-modal="true"
       >
-        <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">
+          ×
+        </button>
 
         <h3 className="modal-title">{show.movie_title || "Show"} — Seat Map</h3>
         <p className="seat-map-sub">
@@ -102,7 +110,10 @@ export default function SeatMapModal({ show, onClose }) {
         </p>
 
         {usingDummy && (
-          <div className="msg msg-error" style={{ marginBottom: 14, fontSize: "0.78rem" }}>
+          <div
+            className="msg msg-error"
+            style={{ marginBottom: 14, fontSize: "0.78rem" }}
+          >
             Showing sample seat layout (live seat data unavailable).
           </div>
         )}
@@ -144,7 +155,9 @@ export default function SeatMapModal({ show, onClose }) {
               <div className="occupancy-bar">
                 <div className="occupancy-fill" style={{ width: `${pct}%` }} />
               </div>
-              <span className="occupancy-text">{booked}/{total} seats filled ({pct}%)</span>
+              <span className="occupancy-text">
+                {booked}/{total} seats filled ({pct}%)
+              </span>
             </div>
           </>
         )}

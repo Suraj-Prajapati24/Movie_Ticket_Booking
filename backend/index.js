@@ -20,6 +20,9 @@ app.use("/shows", showRouter);
 app.use("/movies", moviesRouter);
 app.use("/screens", screensRouter);
 
-app.listen(5000, () => {
-    console.log("app is listenging");
-})
+// TODO: For development purpose uncomment and comment export
+// app.listen(5000, () => {
+//     console.log("app is listenging");
+// })
+
+export default app;

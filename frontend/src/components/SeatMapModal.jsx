@@ -12,8 +12,6 @@ function formatDateTime(str) {
   return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-// Fallback layout so admins can preview the seat map even before the backend
-// is wired up. Mirrors the 3×6 grid (A1–C6) the backend seeds per show.
 function dummySeats() {
   const rows = ["A", "B", "C"];
   const bookedSet = new Set(["A2", "A3", "B5", "C1", "C2", "C6"]);

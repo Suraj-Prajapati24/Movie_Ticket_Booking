@@ -33,14 +33,6 @@ function dummySeats() {
   return seats;
 }
 
-/**
- * Read-only seat map for the admin. Shows which seats are booked vs vacant for
- * a given show so the admin can eyeball occupancy at a glance.
- *
- * Props:
- *   show     the show object (needs show_id; movie_title/screen_number/start_time used for the header)
- *   onClose  close the modal
- */
 export default function SeatMapModal({ show, onClose }) {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +70,6 @@ export default function SeatMapModal({ show, onClose }) {
     };
   }, [show.show_id]);
 
-  // Close on Escape.
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onClose();

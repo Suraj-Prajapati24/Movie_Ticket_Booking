@@ -21,7 +21,9 @@ export default function AuthPage({ onLogin }) {
       ? `${API_BASE}/auth/login`
       : `${API_BASE}/auth/register`;
 
-    const body = isLogin ? { email: form.email, password: form.password } : form;
+    const body = isLogin
+      ? { email: form.email, password: form.password }
+      : form;
 
     try {
       const res = await fetch(url, {
@@ -125,7 +127,11 @@ export default function AuthPage({ onLogin }) {
             />
           </div>
 
-          {error && <div className="msg msg-error" style={{ marginBottom: 14 }}>{error}</div>}
+          {error && (
+            <div className="msg msg-error" style={{ marginBottom: 14 }}>
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

@@ -83,8 +83,6 @@ export default function AddShow({ initialScreen = "" }) {
 
     const token = localStorage.getItem("token");
     try {
-      // end_time is intentionally NOT sent — the backend derives it from the
-      // movie's runtime so it can't be tampered with.
       const res = await fetch(`${API_BASE}/shows`, {
         method: "POST",
         headers: {

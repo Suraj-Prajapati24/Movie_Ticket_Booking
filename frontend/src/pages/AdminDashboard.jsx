@@ -21,9 +21,15 @@ export default function AdminDashboard() {
   return (
     <>
       <header className="app-header">
-        <div className="logo">🎬 <span>Movie</span>Junction</div>
-        <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>Admin Panel</span>
-        <button className="btn btn-ghost btn-sm" onClick={handleLogout}>Logout</button>
+        <div className="logo">
+          🎬 <span>Movie</span>Junction
+        </div>
+        <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>
+          Admin Panel
+        </span>
+        <button className="btn btn-ghost btn-sm" onClick={handleLogout}>
+          Logout
+        </button>
       </header>
 
       <div className="page">
@@ -50,7 +56,9 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {view === "manage" && <ManageShows onAddShow={handleAddShowForScreen} />}
+        {view === "manage" && (
+          <ManageShows onAddShow={handleAddShowForScreen} />
+        )}
         {view === "movies" && <AddMovie />}
         {view === "shows" && <AddShow initialScreen={prefillScreen} />}
       </div>

@@ -1,8 +1,5 @@
 import client, { withTransaction } from "../dbConnection.js";
 
-// Add `minutes` to a "YYYY-MM-DDTHH:MM[:SS]" local datetime and return a
-// "YYYY-MM-DD HH:MM:SS" string, with NO timezone shift. The DB columns are
-// TIMESTAMP (tz-naive) and the frontend speaks local time, so we keep it naive.
 function addMinutesNaive(startStr, minutes) {
   const d = new Date(startStr);
   if (isNaN(d)) return null;
@@ -11,9 +8,6 @@ function addMinutesNaive(startStr, minutes) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
 }
 
-// ─── Seat map for one show ──────────────────────────────────────────────────
-// Seats are physical and belong to the show's SCREEN. A seat is "booked" for
-// THIS show only if a booking_seats row links them — computed with EXISTS.
 export const getShowSeats = async (req, res) => {
   const show_id = req.params.show_id;
   try {
@@ -31,7 +25,7 @@ export const getShowSeats = async (req, res) => {
        JOIN shows sh ON sh.show_id = $1
        WHERE se.screen_id = sh.screen_id
        ORDER BY se.row_label, se.seat_col`,
-      [show_id]
+      [show_id],
     );
     return res.status(200).json(seats.rows);
   } catch (error) {
@@ -43,7 +37,6 @@ export const getShowSeats = async (req, res) => {
   }
 };
 
-// ─── Shows for one movie (client browse view) ───────────────────────────────
 export const getShowsByMovie = async (req, res) => {
   const { movie_id } = req.params;
   try {
@@ -61,7 +54,7 @@ export const getShowsByMovie = async (req, res) => {
        JOIN screens sc ON sc.screen_id = sh.screen_id
        WHERE sh.movie_id = $1
        ORDER BY sh.start_time`,
-      [movie_id]
+      [movie_id],
     );
     return res.status(200).json(result.rows);
   } catch (error) {
@@ -70,7 +63,6 @@ export const getShowsByMovie = async (req, res) => {
   }
 };
 
-// ─── Single show detail (used by the seat-booking page for price/header) ─────
 export const getShowById = async (req, res) => {
   const { show_id } = req.params;
   try {
@@ -92,7 +84,7 @@ export const getShowById = async (req, res) => {
        JOIN movies m ON m.movie_id = sh.movie_id
        JOIN screens sc ON sc.screen_id = sh.screen_id
        WHERE sh.show_id = $1`,
-      [show_id]
+      [show_id],
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Show not found" });
@@ -104,10 +96,6 @@ export const getShowById = async (req, res) => {
   }
 };
 
-// ─── Create a show ──────────────────────────────────────────────────────────
-// end_time is derived from the movie's runtime (never trusted from the client).
-// The overlap check + insert run in one transaction so two admins can't slot
-// overlapping shows onto the same screen at the same instant.
 export const createShow = async (req, res) => {
   const { movie_id, screen_id, start_time, price } = req.body;
 
@@ -120,7 +108,7 @@ export const createShow = async (req, res) => {
   try {
     const movie = await client.query(
       `SELECT duration_minutes FROM movies WHERE movie_id = $1`,
-      [movie_id]
+      [movie_id],
     );
     if (movie.rowCount === 0) {
       return res.status(404).json({ message: "Movie not found" });
@@ -134,7 +122,7 @@ export const createShow = async (req, res) => {
 
     const screen = await client.query(
       `SELECT 1 FROM screens WHERE screen_id = $1`,
-      [screen_id]
+      [screen_id],
     );
     if (screen.rowCount === 0) {
       return res.status(404).json({ message: "Screen not found" });
@@ -159,14 +147,12 @@ export const createShow = async (req, res) => {
     }
 
     const show_id = await withTransaction(async (tx) => {
-      // Two shows overlap on a screen when one starts before the other ends
-      // AND ends after the other starts.
       const overlap = await tx.query(
         `SELECT 1 FROM shows
          WHERE screen_id = $1
            AND start_time < $2
            AND end_time   > $3`,
-        [screen_id, end_time, start_time]
+        [screen_id, end_time, start_time],
       );
       if (overlap.rowCount > 0) {
         const err = new Error("Screen already occupied during this time");
@@ -178,12 +164,14 @@ export const createShow = async (req, res) => {
         `INSERT INTO shows (movie_id, screen_id, start_time, end_time, price)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING show_id`,
-        [movie_id, screen_id, start_time, end_time, priceValue]
+        [movie_id, screen_id, start_time, end_time, priceValue],
       );
       return inserted.rows[0].show_id;
     });
 
-    return res.status(201).json({ message: "Show created successfully", show_id });
+    return res
+      .status(201)
+      .json({ message: "Show created successfully", show_id });
   } catch (error) {
     if (error.status) {
       return res.status(error.status).json({ message: error.message });
@@ -193,9 +181,6 @@ export const createShow = async (req, res) => {
   }
 };
 
-// ─── All shows (admin dashboard) ────────────────────────────────────────────
-// Counts come from independent subqueries — joining seats AND bookings in one
-// grouped query would multiply the rows (cartesian product) and inflate counts.
 export const getAllShows = async (req, res) => {
   try {
     const result = await client.query(
@@ -214,7 +199,7 @@ export const getAllShows = async (req, res) => {
        FROM shows sh
        JOIN movies m  ON m.movie_id  = sh.movie_id
        JOIN screens sc ON sc.screen_id = sh.screen_id
-       ORDER BY sh.start_time`
+       ORDER BY sh.start_time`,
     );
     return res.status(200).json(result.rows);
   } catch (error) {
@@ -223,15 +208,12 @@ export const getAllShows = async (req, res) => {
   }
 };
 
-// ─── Delete a show ──────────────────────────────────────────────────────────
-// bookings, booking_seats and payments all cascade via FK ON DELETE CASCADE.
-// Physical seats belong to the screen and are intentionally NOT deleted.
 export const deleteShow = async (req, res) => {
   const { show_id } = req.params;
   try {
     const result = await client.query(
       `DELETE FROM shows WHERE show_id = $1 RETURNING show_id`,
-      [show_id]
+      [show_id],
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Show not found" });

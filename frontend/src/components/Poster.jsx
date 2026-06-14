@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-// Deterministic hue from the title so each fallback poster gets a stable colour.
 function hueFromTitle(title = "") {
   let hash = 0;
   for (let i = 0; i < title.length; i++) {
@@ -9,11 +8,6 @@ function hueFromTitle(title = "") {
   return Math.abs(hash) % 360;
 }
 
-/**
- * Renders a movie poster image. If `url` is missing or fails to load,
- * falls back to a generated gradient tile with the movie's initial —
- * so the UI never shows a broken-image icon (works offline too).
- */
 export default function Poster({ url, title, className = "" }) {
   const [failed, setFailed] = useState(false);
   const showImage = url && !failed;
@@ -39,7 +33,9 @@ export default function Poster({ url, title, className = "" }) {
       }}
       aria-label={`${title} poster`}
     >
-      <span className="poster-initial">{(title || "?").charAt(0).toUpperCase()}</span>
+      <span className="poster-initial">
+        {(title || "?").charAt(0).toUpperCase()}
+      </span>
     </div>
   );
 }

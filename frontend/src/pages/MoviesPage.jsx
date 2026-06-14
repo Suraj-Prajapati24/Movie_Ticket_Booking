@@ -58,7 +58,9 @@ export default function MoviesPage({ onSelectMovie }) {
             <div className="poster-wrap">
               <Poster url={movie.poster_url} title={movie.title} />
               {movie.duration_minutes != null && (
-                <span className="poster-duration">{movie.duration_minutes} min</span>
+                <span className="poster-duration">
+                  {movie.duration_minutes} min
+                </span>
               )}
             </div>
             <div className="movie-card-body">
@@ -67,7 +69,13 @@ export default function MoviesPage({ onSelectMovie }) {
                 <span className="badge badge-gold">{movie.language}</span>
               </div>
               {movie.description && (
-                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                <p
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "var(--text-muted)",
+                    lineHeight: 1.5,
+                  }}
+                >
                   {movie.description.length > 90
                     ? movie.description.slice(0, 90) + "…"
                     : movie.description}

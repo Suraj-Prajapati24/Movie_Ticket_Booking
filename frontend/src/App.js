@@ -55,12 +55,17 @@ function App() {
   return (
     <>
       <header className="app-header">
-        <div className="logo">🎬 <span>Movie</span>Junction</div>
+        <div className="logo">
+          🎬 <span>Movie</span>Junction
+        </div>
 
         {tab === "browse" ? (
           <nav className="breadcrumb">
             <span
-              style={{ cursor: selectedMovie ? "pointer" : "default", color: selectedMovie ? "var(--text-muted)" : "var(--gold)" }}
+              style={{
+                cursor: selectedMovie ? "pointer" : "default",
+                color: selectedMovie ? "var(--text-muted)" : "var(--gold)",
+              }}
               onClick={selectedMovie ? handleBackToMovies : undefined}
             >
               Movies
@@ -69,7 +74,10 @@ function App() {
               <>
                 <span className="sep">›</span>
                 <span
-                  style={{ cursor: selectedShow ? "pointer" : "default", color: selectedShow ? "var(--text-muted)" : "var(--gold)" }}
+                  style={{
+                    cursor: selectedShow ? "pointer" : "default",
+                    color: selectedShow ? "var(--text-muted)" : "var(--gold)",
+                  }}
                   onClick={selectedShow ? handleBackToShows : undefined}
                 >
                   {selectedMovie.title}
@@ -84,7 +92,9 @@ function App() {
             )}
           </nav>
         ) : (
-          <nav className="breadcrumb"><span className="current">My Bookings</span></nav>
+          <nav className="breadcrumb">
+            <span className="current">My Bookings</span>
+          </nav>
         )}
 
         <div className="header-actions">
@@ -111,9 +121,7 @@ function App() {
           <MyBookings />
         ) : (
           <>
-            {!selectedMovie && (
-              <MoviesPage onSelectMovie={handleSelectMovie} />
-            )}
+            {!selectedMovie && <MoviesPage onSelectMovie={handleSelectMovie} />}
 
             {selectedMovie && !selectedShow && (
               <ShowsPage
@@ -125,10 +133,7 @@ function App() {
             )}
 
             {selectedShow && (
-              <SeatsPage
-                showId={selectedShow}
-                onBack={handleBackToShows}
-              />
+              <SeatsPage showId={selectedShow} onBack={handleBackToShows} />
             )}
           </>
         )}

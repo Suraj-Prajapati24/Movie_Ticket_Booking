@@ -5,7 +5,7 @@ import {
   getShowById,
   createShow,
   getAllShows,
-  deleteShow
+  deleteShow,
 } from "../controllers/show.controller.js";
 import { authenticateToken } from "../middleware/auth.middleware.js";
 import { requireManager } from "../middleware/manager.middleware.js";

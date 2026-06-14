@@ -13,8 +13,6 @@ function formatDateTime(str) {
   return d.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-// Counts arrive from SQL aggregates and may be strings ("18") depending on the
-// driver — coerce so arithmetic and the occupancy bar behave.
 function num(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
@@ -24,7 +22,7 @@ export default function ManageShows({ onAddShow }) {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeShow, setActiveShow] = useState(null); // show object for the seat-map modal
+  const [activeShow, setActiveShow] = useState(null); 
 
   const load = () => {
     setLoading(true);
@@ -59,8 +57,6 @@ export default function ManageShows({ onAddShow }) {
   const totalBooked = shows.reduce((sum, s) => sum + s.booked_seats, 0);
   const totalSeats = shows.reduce((sum, s) => sum + s.total_seats, 0);
 
-  // Group shows by screen so the admin can see each screen's schedule and plan
-  // the next slot. Screens sorted numerically; shows within a screen by start.
   const screens = Array.from(new Set(shows.map((s) => s.screen_number))).sort(
     (a, b) => num(a) - num(b)
   );

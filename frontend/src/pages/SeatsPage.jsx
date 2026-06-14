@@ -11,7 +11,13 @@ function parseShowDate(str) {
 function formatDateTime(str) {
   const d = parseShowDate(str);
   if (isNaN(d)) return str || "";
-  return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function SeatsPage({ showId, onBack }) {
@@ -28,7 +34,9 @@ export default function SeatsPage({ showId, onBack }) {
   const loadSeats = () => {
     setLoading(true);
     Promise.all([
-      fetch(`${API_BASE}/shows/${showId}`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${API_BASE}/shows/${showId}`).then((r) =>
+        r.ok ? r.json() : null,
+      ),
       fetch(`${API_BASE}/shows/${showId}/seats`).then((r) => {
         if (!r.ok) throw new Error(`Server error ${r.status}`);
         return r.json();
@@ -46,7 +54,6 @@ export default function SeatsPage({ showId, onBack }) {
     loadSeats();
   }, [showId]);
 
-  // Lay the grid out to match the screen's real row width (e.g. 6 or 8 wide).
   const columns = useMemo(() => {
     const max = seats.reduce((m, s) => Math.max(m, Number(s.seat_col) || 0), 0);
     return max || 6;
@@ -55,11 +62,12 @@ export default function SeatsPage({ showId, onBack }) {
   const toggleSeat = (seatId) => {
     setMessage(null);
     setSelectedSeats((prev) =>
-      prev.includes(seatId) ? prev.filter((id) => id !== seatId) : [...prev, seatId]
+      prev.includes(seatId)
+        ? prev.filter((id) => id !== seatId)
+        : [...prev, seatId],
     );
   };
 
-  // Called by the payment modal once the (fake) payment clears.
   const submitBooking = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -101,24 +109,32 @@ export default function SeatsPage({ showId, onBack }) {
   return (
     <div>
       <div className="back-row">
-        <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back</button>
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>
+          ← Back
+        </button>
         <h2>Select Seats</h2>
       </div>
 
       {show && (
         <p className="seat-map-sub" style={{ marginTop: -8 }}>
-          {show.movie_title} · Screen {show.screen_number} · {formatDateTime(show.start_time)} · ₹{pricePerSeat}/seat
+          {show.movie_title} · Screen {show.screen_number} ·{" "}
+          {formatDateTime(show.start_time)} · ₹{pricePerSeat}/seat
         </p>
       )}
 
       {message && (
-        <div className={`msg ${message.type === "success" ? "msg-success" : "msg-error"}`} style={{ marginBottom: 16 }}>
+        <div
+          className={`msg ${message.type === "success" ? "msg-success" : "msg-error"}`}
+          style={{ marginBottom: 16 }}
+        >
           {message.text}
         </div>
       )}
 
       {loading ? (
-        <div className="spinner-wrap"><div className="spinner" /></div>
+        <div className="spinner-wrap">
+          <div className="spinner" />
+        </div>
       ) : (
         <div className="seat-section">
           <div>
@@ -155,16 +171,27 @@ export default function SeatsPage({ showId, onBack }) {
 
           <div className="booking-bar">
             <div className="booking-summary">
-              {selectedSeats.length === 0
-                ? "Click seats above to select them"
-                : <><strong>{selectedSeats.length}</strong> seat{selectedSeats.length > 1 ? "s" : ""} · ₹{selectedSeats.length * pricePerSeat}</>}
+              {selectedSeats.length === 0 ? (
+                "Click seats above to select them"
+              ) : (
+                <>
+                  <strong>{selectedSeats.length}</strong> seat
+                  {selectedSeats.length > 1 ? "s" : ""} · ₹
+                  {selectedSeats.length * pricePerSeat}
+                </>
+              )}
             </div>
             <button
               className="btn btn-primary"
-              onClick={() => { setMessage(null); setShowPayment(true); }}
+              onClick={() => {
+                setMessage(null);
+                setShowPayment(true);
+              }}
               disabled={selectedSeats.length === 0}
             >
-              {selectedSeats.length > 0 ? `Pay ₹${selectedSeats.length * pricePerSeat}` : "Confirm Booking"}
+              {selectedSeats.length > 0
+                ? `Pay ₹${selectedSeats.length * pricePerSeat}`
+                : "Confirm Booking"}
             </button>
           </div>
         </div>

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_BASE } from "../config";
 
-// SQLite stores datetimes as "YYYY-MM-DD HH:MM:SS" (space separator).
-// new Date() on that string is Invalid Date in Safari/Firefox.
-// Replace the space with T to get proper ISO 8601.
 function parseShowDate(str) {
   if (!str) return new Date(NaN);
   return new Date(str.includes("T") ? str : str.replace(" ", "T"));
@@ -18,10 +15,19 @@ function formatTime(dateStr) {
 function formatDate(dateStr) {
   const d = parseShowDate(dateStr);
   if (isNaN(d)) return "";
-  return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+  return d.toLocaleDateString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 }
 
-export default function ShowsPage({ movieId, movieTitle, onSelectShow, onBack }) {
+export default function ShowsPage({
+  movieId,
+  movieTitle,
+  onSelectShow,
+  onBack,
+}) {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,14 +46,18 @@ export default function ShowsPage({ movieId, movieTitle, onSelectShow, onBack })
   return (
     <div>
       <div className="back-row">
-        <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back</button>
+        <button className="btn btn-ghost btn-sm" onClick={onBack}>
+          ← Back
+        </button>
         <h2>{movieTitle}</h2>
       </div>
 
       <h3 className="page-title">Available Shows</h3>
 
       {loading && (
-        <div className="spinner-wrap"><div className="spinner" /></div>
+        <div className="spinner-wrap">
+          <div className="spinner" />
+        </div>
       )}
 
       {error && (
@@ -73,7 +83,9 @@ export default function ShowsPage({ movieId, movieTitle, onSelectShow, onBack })
                 key={show.show_id}
                 className={`card show-card ${soldOut ? "" : "clickable"}`}
                 onClick={() => !soldOut && onSelectShow(show.show_id)}
-                style={soldOut ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+                style={
+                  soldOut ? { opacity: 0.6, cursor: "not-allowed" } : undefined
+                }
               >
                 <div>
                   <div className="show-time">
@@ -84,10 +96,14 @@ export default function ShowsPage({ movieId, movieTitle, onSelectShow, onBack })
                     {show.price != null && <> · ₹{Number(show.price)}/seat</>}
                   </div>
                   <div className="show-seats-left">
-                    {soldOut ? "Sold out" : `${left} seat${left === 1 ? "" : "s"} left`}
+                    {soldOut
+                      ? "Sold out"
+                      : `${left} seat${left === 1 ? "" : "s"} left`}
                   </div>
                 </div>
-                <span className="screen-badge">Screen {show.screen_number}</span>
+                <span className="screen-badge">
+                  Screen {show.screen_number}
+                </span>
               </div>
             );
           })}

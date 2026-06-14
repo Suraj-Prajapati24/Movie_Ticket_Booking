@@ -9,7 +9,13 @@ function parseShowDate(str) {
 function formatDateTime(str) {
   const d = parseShowDate(str);
   if (isNaN(d)) return str || "—";
-  return d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  return d.toLocaleString([], {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function MyBookings() {
@@ -35,9 +41,15 @@ export default function MyBookings() {
     <div>
       <h2 className="page-title">My Bookings</h2>
 
-      {loading && <div className="spinner-wrap"><div className="spinner" /></div>}
+      {loading && (
+        <div className="spinner-wrap">
+          <div className="spinner" />
+        </div>
+      )}
 
-      {error && <div className="msg msg-error">Failed to load bookings: {error}</div>}
+      {error && (
+        <div className="msg msg-error">Failed to load bookings: {error}</div>
+      )}
 
       {!loading && !error && bookings.length === 0 && (
         <div className="empty-state">
@@ -65,8 +77,12 @@ export default function MyBookings() {
                   </div>
                 </div>
                 <div className="booking-card-side">
-                  <span className={`booking-status booking-status-${b.status}`}>{b.status}</span>
-                  <div className="booking-amount">₹{Number(b.total_amount)}</div>
+                  <span className={`booking-status booking-status-${b.status}`}>
+                    {b.status}
+                  </span>
+                  <div className="booking-amount">
+                    ₹{Number(b.total_amount)}
+                  </div>
                   <div className="booking-id">#{b.booking_id}</div>
                 </div>
               </div>

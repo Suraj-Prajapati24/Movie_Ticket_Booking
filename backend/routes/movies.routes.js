@@ -2,7 +2,7 @@ import express from "express";
 import {
   getAllMovies,
   createMovie,
-  deleteMovie
+  deleteMovie,
 } from "../controllers/movies.controller.js";
 import { authenticateToken } from "../middleware/auth.middleware.js";
 import { requireManager } from "../middleware/manager.middleware.js";

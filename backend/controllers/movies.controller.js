@@ -5,7 +5,7 @@ export const getAllMovies = async (req, res) => {
     const movies = await client.query(
       `SELECT movie_id, title, description, duration_minutes, language, poster_url
        FROM movies
-       ORDER BY created_at DESC`
+       ORDER BY created_at DESC`,
     );
     return res.status(200).json(movies.rows);
   } catch (error) {
@@ -16,7 +16,8 @@ export const getAllMovies = async (req, res) => {
 
 export const createMovie = async (req, res) => {
   try {
-    const { title, description, duration_minutes, language, poster_url } = req.body;
+    const { title, description, duration_minutes, language, poster_url } =
+      req.body;
 
     if (!title || !duration_minutes) {
       return res.status(400).json({
@@ -24,7 +25,9 @@ export const createMovie = async (req, res) => {
       });
     }
     if (Number(duration_minutes) <= 0) {
-      return res.status(400).json({ message: "duration_minutes must be positive" });
+      return res
+        .status(400)
+        .json({ message: "duration_minutes must be positive" });
     }
 
     const result = await client.query(
@@ -37,7 +40,7 @@ export const createMovie = async (req, res) => {
         Number(duration_minutes),
         language ? String(language).trim() : null,
         poster_url ? String(poster_url).trim() : null,
-      ]
+      ],
     );
 
     return res.status(201).json(result.rows[0]);
@@ -51,10 +54,9 @@ export const deleteMovie = async (req, res) => {
   const { movie_id } = req.params;
 
   try {
-    // Shows (and their bookings/seats/payments) cascade via FK ON DELETE CASCADE.
     const result = await client.query(
       `DELETE FROM movies WHERE movie_id = $1 RETURNING movie_id`,
-      [movie_id]
+      [movie_id],
     );
 
     if (result.rowCount === 0) {
